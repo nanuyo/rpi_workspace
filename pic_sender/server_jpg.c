@@ -33,6 +33,8 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+while(1)
+{
     // Listen for incoming connections
     if (listen(server_fd, 3) < 0) {
         perror("listen");
@@ -71,8 +73,10 @@ int main() {
 
     // Close sockets and file descriptor
     close(new_socket);
-    close(server_fd);
+ 
     close(file_fd);
+}
 
+   close(server_fd);
     return 0;
 }
