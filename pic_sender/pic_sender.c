@@ -19,7 +19,7 @@
 #include <fcntl.h>
 
 #define PORT 3000
-#define SERVER_ADDRESS "172.30.1.1"
+#define SERVER_ADDRESS "172.30.1.87"
 #define BUFFER_SIZE 1024
 
 int client_jpg_sender() {
