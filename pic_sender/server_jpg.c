@@ -16,9 +16,6 @@ int main() {
     char buffer[BUFFER_SIZE] = {0};
     int file_fd;
 
-while(1)
-{
-
     // Create a socket
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("socket failed");
@@ -71,13 +68,11 @@ while(1)
     }
 
     printf("File received successfully\n");
-        close(new_socket);
-        close(file_fd);
 
     // Close sockets and file descriptor
-
+    close(new_socket);
     close(server_fd);
-};    
+    close(file_fd);
 
     return 0;
 }
