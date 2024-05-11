@@ -84,6 +84,8 @@ int main() {
     struct v4l2_buffer buf;
     void* buffer;
     FILE* fp;
+     
+    int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
     // Open the video device
     fd = open(VIDEO_DEVICE, O_RDWR);
@@ -139,27 +141,32 @@ int main() {
         close(fd);
         return EXIT_FAILURE;
     }
+ 
+    for (int i = 0; i < 20; ++i) //Frame skip
+    {
+        // Queue buffer
+        if (ioctl(fd, VIDIOC_QBUF, &buf) == -1) {
+            perror("Failed to queue buffer");
+            close(fd);
+            return EXIT_FAILURE;
+        }
 
-    // Queue buffer
-    if (ioctl(fd, VIDIOC_QBUF, &buf) == -1) {
-        perror("Failed to queue buffer");
-        close(fd);
-        return EXIT_FAILURE;
-    }
+    
+        // Start capture
+        if (ioctl(fd, VIDIOC_STREAMON, &type) == -1) {
+            perror("Failed to start capture");
+            close(fd);
+            return EXIT_FAILURE;
+        }
+        
 
-    // Start capture
-    int type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-    if (ioctl(fd, VIDIOC_STREAMON, &type) == -1) {
-        perror("Failed to start capture");
-        close(fd);
-        return EXIT_FAILURE;
-    }
-
-    // Dequeue buffer
-    if (ioctl(fd, VIDIOC_DQBUF, &buf) == -1) {
-        perror("Failed to dequeue buffer");
-        close(fd);
-        return EXIT_FAILURE;
+        // Dequeue buffer
+        if (ioctl(fd, VIDIOC_DQBUF, &buf) == -1) {
+            perror("Failed to dequeue buffer");
+            close(fd);
+            return EXIT_FAILURE;
+        }
+        
     }
 
     // Stop capture
@@ -169,6 +176,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    
     // Save captured image as a JPEG file
     fp = fopen(OUTPUT_FILE, "wb");
     if (fp == NULL) {
@@ -181,7 +189,7 @@ int main() {
 
     // Unmap buffer
     munmap(buffer, buf.length);
-
+    
     // Close video device
     close(fd);
 
