@@ -70,11 +70,13 @@ while(1)
     }
 
     printf("File received successfully\n");
+        close(new_socket);
+        close(file_fd);
 };
     // Close sockets and file descriptor
-    close(new_socket);
+
     close(server_fd);
-    close(file_fd);
+    
 
     return 0;
 }
