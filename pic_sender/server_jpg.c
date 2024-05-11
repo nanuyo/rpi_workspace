@@ -33,7 +33,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-while()
+while(1)
 {
     // Listen for incoming connections
     if (listen(server_fd, 3) < 0) {
@@ -70,7 +70,7 @@ while()
     }
 
     printf("File received successfully\n");
-}
+};
     // Close sockets and file descriptor
     close(new_socket);
     close(server_fd);
