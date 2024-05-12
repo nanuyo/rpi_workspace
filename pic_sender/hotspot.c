@@ -1,59 +1,85 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <linux/netlink.h>
+#include <linux/genetlink.h> // Include genetlink.h for struct genlmsghdr
+#include <linux/nl80211.h>   // Include nl80211.h for NL80211_ATTR_IFNAME
+#include <linux/wireless.h>
 
-#define MAX_COMMAND_LENGTH 256
+#define MAX_PAYLOAD 4096
+#define NL80211_GENL_NAME "nl80211"
+#define NL80211_CMD_NEW_INTERFACE 8
+#define NLA_DATA(na) ((void *)((char*)(na) + NLA_HDRLEN))
+
+
+static int nl_socket;
+
+// Function to send a message to the nl80211 kernel module
+void send_nl_msg(struct nlmsghdr *nlh) {
+    struct sockaddr_nl dest_addr;
+
+    memset(&dest_addr, 0, sizeof(dest_addr));
+    dest_addr.nl_family = AF_NETLINK;
+    dest_addr.nl_pid = 0; // For Linux kernel, pid 0 means the message goes to the kernel
+    dest_addr.nl_groups = 0; // Unicast message
+
+    struct iovec iov = {nlh, nlh->nlmsg_len};
+    struct msghdr msg = {&dest_addr, sizeof(dest_addr), &iov, 1, NULL, 0, 0};
+
+    sendmsg(nl_socket, &msg, 0);
+}
+
+// Function to create a WiFi hotspot using hostapd
+void create_wifi_hotspot(const char *interface_name) {
+    char command[256];
+    sprintf(command, "hostapd -B /etc/hostapd/hostapd.conf -i %s", interface_name);
+    system(command);
+}
 
 int main() {
-    FILE *fp;
-    char command[MAX_COMMAND_LENGTH];
-    char interface[50]; // Assuming interface name is at most 50 characters long
+    struct nlmsghdr *nlh;
+    struct genlmsghdr *gnlh;
+    struct nlattr *na;
+    int ret;
 
-    // Check if the interface is up
-    fp = popen("iw dev | grep Interface | awk '{print $2}'", "r");
-    if (fp == NULL) {
-        printf("Failed to run command\n");
-        exit(1);
-    }
-    fgets(interface, sizeof(interface)-1, fp);
-    pclose(fp);
-
-    if (interface[0] == '\0') {
-        printf("No wireless interface found\n");
-        exit(1);
+    nl_socket = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+    if (nl_socket < 0) {
+        perror("Error creating netlink socket");
+        return -1;
     }
 
-    // Strip newline character from interface name
-    strtok(interface, "\n");
-
-    // Check if the hotspot interface already exists
-    snprintf(command, sizeof(command), "iw dev %s interface list | grep wlan0", interface);
-    fp = popen(command, "r");
-    if (fp != NULL && fgets(command, sizeof(command), fp) != NULL) {
-        printf("Hotspot interface already exists\n");
-        pclose(fp);
-        exit(1);
+    nlh = malloc(NLMSG_SPACE(MAX_PAYLOAD));
+    if (!nlh) {
+        perror("Error allocating memory for netlink message");
+        close(nl_socket);
+        return -1;
     }
-    pclose(fp);
+    
+    memset(nlh, 0, NLMSG_SPACE(MAX_PAYLOAD));
+    nlh->nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);
+    nlh->nlmsg_pid = getpid();
+    nlh->nlmsg_flags = 0;
 
-    // Set up the hotspot
-    snprintf(command, sizeof(command), "iw dev %s interface add wlan0 type __ap", interface);
-    system(command);
+    gnlh = (struct genlmsghdr *)NLMSG_DATA(nlh);
+    gnlh->cmd = NL80211_CMD_NEW_INTERFACE;
+    gnlh->version = 1;
 
-    snprintf(command, sizeof(command), "ip link set dev wlan0 up");
-    system(command);
+    na = (struct nlattr *)(gnlh + 1);
+    na->nla_type = NL80211_ATTR_IFNAME;
+    na->nla_len = strlen("wlan0") + 1 + sizeof(struct nlattr);
+    strcpy((char *)NLA_DATA(na), "wlan0");
 
-    snprintf(command, sizeof(command), "ip addr add 192.168.1.1/24 dev wlan0");
-    system(command);
+    nlh->nlmsg_len = NLMSG_ALIGN(nlh->nlmsg_len) + NLMSG_ALIGN(na->nla_len);
 
-    snprintf(command, sizeof(command), "dnsmasq --interface=wlan0 --dhcp-range=192.168.1.2,192.168.1.10,255.255.255.0,12h");
-    system(command);
+    send_nl_msg(nlh);
 
-    // Replace <internet-interface> with the actual name of your internet-facing interface
-    snprintf(command, sizeof(command), "iptables -t nat -A POSTROUTING -o <internet-interface> -j MASQUERADE");
-    system(command);
+    // Assuming 'wlan0' is the name of the WiFi interface you want to use for the hotspot
+    create_wifi_hotspot("wlan0");
 
-    printf("Hotspot created successfully\n");
-
+    free(nlh);
+    close(nl_socket);
     return 0;
 }
