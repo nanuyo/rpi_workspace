@@ -58,7 +58,7 @@ int main()
 
         sprintf(filename, "received_image_%d.jpg", img_cnt); // Format the filename
         // Open file to write received data
-        if ((file_fd = open("received_image.jpg", img_cnt, O_WRONLY | O_CREAT | O_TRUNC, 0644)) == -1)
+        if ((file_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0644)) == -1)
         {
             perror("open");
             exit(EXIT_FAILURE);
