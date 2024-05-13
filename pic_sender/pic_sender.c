@@ -7,9 +7,15 @@
 #include <sys/mman.h>
 #include <linux/videodev2.h>
 
-#define WIDTH 1920
-#define HEIGHT 1080
+/*#define WIDTH 1920
+#define HEIGHT 1080*/
+
+#define WIDTH 2880
+#define HEIGHT 1624
+
 #define VIDEO_DEVICE "/dev/video0"
+#define VIDEO_DEVICE2 "/dev/video2"
+#define VIDEO_DEVICE3 "/dev/video4"
 #define OUTPUT_FILE "captured_image.jpg"
 
 
@@ -19,7 +25,9 @@
 #include <fcntl.h>
 
 #define PORT 3000
-#define SERVER_ADDRESS "172.30.1.98"
+//#define SERVER_ADDRESS "172.30.1.98"
+//#define SERVER_ADDRESS "192.168.0.51"
+#define SERVER_ADDRESS "192.168.0.3"
 #define BUFFER_SIZE 1024
 
 int client_jpg_sender() {
