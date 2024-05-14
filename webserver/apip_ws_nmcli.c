@@ -49,7 +49,7 @@ int main() {
     // Start SoftAP mode
     const char *ap_ssid = "MySoftAP";
     const char *ap_password = "mypassword";
-    const char *ap_ip_address = "192.168.1.5";
+    const char *ap_ip_address = "192.168.1.1";
     start_softap_mode(ap_ssid, ap_password, ap_ip_address);
 
     int server_fd, new_socket;
