@@ -93,7 +93,7 @@ int main()
         printf("Received request:\n%s\n", buffer);
 
         // 요청이 HTML 폼을 위한 것인지 확인
-        if (strstr(buffer, "GET /input.html") != NULL)
+        if (strstr(buffer, "GET /form.html") != NULL)
         {
             // HTML 폼 전송
             serve_html(new_socket);
@@ -121,7 +121,7 @@ int main()
 
 void serve_html(int client_socket)
 {
-    FILE *html_file = fopen("input.html", "r");
+    FILE *html_file = fopen("form.html", "r");
     if (html_file == NULL)
     {
         perror("Error opening HTML file");
