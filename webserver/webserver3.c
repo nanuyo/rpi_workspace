@@ -1,11 +1,10 @@
-/* Answer by chatgpt for question: please modify this code to use html file which gets phone number
-
-*/
+/* Answer by chatgpt for question: what is the linux c code to get this POST request?*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <fcntl.h>
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
@@ -35,8 +34,8 @@ int main()
     int addrlen = sizeof(address);
     char buffer[BUFFER_SIZE] = {0};
     char *response;
-    char *success_response = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<html><body><h1>Telephone number received successfully!</h1></body></html>\n";
-    char *error_response = "HTTP/1.1 400 Bad Request\nContent-Type: text/html\n\n<html><body><h1>Error: Invalid telephone number format!</h1></body></html>\n";
+    char *success_response = "HTTP/1.1 200 OK\nContent-Type: text/html\n\n<html><body><h1>Wi-Fi configuration saved successfully!</h1></body></html>\n";
+    char *error_response = "HTTP/1.1 400 Bad Request\nContent-Type: text/html\n\n<html><body><h1>Error: Unable to save Wi-Fi configuration!</h1></body></html>\n";
 
     // Create a socket
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
@@ -93,39 +92,38 @@ int main()
             continue;
         }
 
-        // Extract telephone number from the request
-        char *tel_num_start = strstr(buffer, "tel=");
-        if (tel_num_start != NULL)
+        // Check if the request is a POST request
+        if (strstr(buffer, "POST /submit") != NULL)
         {
-            tel_num_start += 4; // Move past "tel="
-            char *tel_num_end = strchr(tel_num_start, '&');
-            if (tel_num_end == NULL)
+            // Extract JSON data from the request body
+            char *json_start = strstr(buffer, "{");
+            if (json_start != NULL)
             {
-                tel_num_end = strchr(tel_num_start, ' '); // End of the line
-            }
-            if (tel_num_end != NULL)
-            {
-                *tel_num_end = '\0'; // Null-terminate the telephone number
-                printf("Telephone number: %s\n", tel_num_start);
-                // Here you can process the telephone number as needed
-                // For now, let's just send a success response
-                response = success_response;
+                char *json_end = strstr(buffer, "\r\n\r\n");
+                if (json_end != NULL)
+                {
+                    *json_end = '\0'; // Null-terminate the JSON data
+                    printf("Received JSON data:\n%s\n", json_start);
+
+                    // Here you can parse and process the JSON data as needed
+                    // For now, let's just send a success response
+                    send(new_socket, success_response, strlen(success_response), 0);
+                    printf("Response sent.\n");
+                }
+                else
+                {
+                    // Invalid request format
+                    send(new_socket, error_response, strlen(error_response), 0);
+                    printf("Invalid request format.\n");
+                }
             }
             else
             {
-                // Invalid telephone number format
-                response = error_response;
+                // JSON data not found in the request
+                send(new_socket, error_response, strlen(error_response), 0);
+                printf("JSON data not found.\n");
             }
         }
-        else
-        {
-            // Telephone number not found in the request
-            response = error_response;
-        }
-
-        // Send the response to the client
-        send(new_socket, response, strlen(response), 0);
-        printf("Response sent.\n");
 
         close(new_socket);
     }

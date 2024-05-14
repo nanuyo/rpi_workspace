@@ -1,3 +1,5 @@
+//  Answer by chatgpt for question: if user want to send telephone number to this webserver, how to change the code?
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
