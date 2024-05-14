@@ -231,4 +231,8 @@ void handle_post_request(int client_socket, char *buffer) {
             printf("Missing ssid or password in JSON data.\n");
         }
     } else {
-        //
+        // Invalid request format
+        send(client_socket, error_response, strlen(error_response), 0);
+        printf("Invalid request format.\n");
+    }
+}
