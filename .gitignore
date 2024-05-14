@@ -52,3 +52,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 *.jpg
+webserver/webserver
+pic_sender/client_jpg
+pic_sender/hotspot
+pic_sender/pic_sender
+pic_sender/server_jpg
