@@ -19,12 +19,12 @@ int main()
     socklen_t addrlen = sizeof(address);
     char buffer[BUFFER_SIZE] = {0};
 
-    system("nmcli device wifi hotspot ifname wlan0 con-name MyHostspot ssid MyHostspotSSID password 12345678");
-    system("nmcli connection modify MyHostspot ipv4.addresses 192.168.1.1/24");
+    system("sudo nmcli device wifi hotspot ifname wlan0 con-name MyHostspot ssid MyHostspotSSID password 12345678");
+    system("sudo nmcli connection modify MyHostspot ipv4.addresses 192.168.1.1/24");
     // nmcli dev wifi list
-    system("nmcli connection modify MyHostspot ipv4.method shared");
+    system("sudo nmcli connection modify MyHostspot ipv4.method shared");
 
-    system("nmcli connection up MyHostspot");
+    system("sudo nmcli connection up MyHostspot");
 
     // 소켓 생성
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
