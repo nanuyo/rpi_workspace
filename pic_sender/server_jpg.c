@@ -20,7 +20,7 @@ int main()
     char filename[50]; // Define a string to hold the filename
 
     // Create a socket
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
     {
         perror("socket failed");
         exit(EXIT_FAILURE);
