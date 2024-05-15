@@ -7,6 +7,7 @@
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
+#define SERVER_ADDRESS "59.11.52.50"
 
 int main() {
     int clientSocket;
@@ -25,7 +26,7 @@ int main() {
     serverAddr.sin_port = htons(PORT);
 
     // 서버 주소 설정
-    if (inet_pton(AF_INET,  "172.30.1.22", &serverAddr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET,  SERVER_ADDRESS , &serverAddr.sin_addr) <= 0) {
         printf("Invalid address/ Address not supported.\n");
         return 1;
     }
