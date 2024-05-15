@@ -8,7 +8,8 @@
 #include <fcntl.h>
 
 #define PORT 8080
-#define SERVER_ADDRESS "192.168.0.3"
+//#define SERVER_ADDRESS "192.168.0.3"
+#define SERVER_ADDRESS "59.11.52.50"
 #define BUFFER_SIZE 1024
 
 int main()
