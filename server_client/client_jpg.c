@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
-#define PORT 3000
+#define PORT 8080
 #define SERVER_ADDRESS "59.11.52.50"
 #define BUFFER_SIZE 1024
 

@@ -6,7 +6,7 @@
 #include <netinet/in.h>
 #include <fcntl.h>
 
-#define PORT 3000
+#define PORT 8080
 #define BUFFER_SIZE 1024
 
 int main()

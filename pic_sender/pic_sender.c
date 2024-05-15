@@ -25,7 +25,7 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 
-#define PORT 3000
+#define PORT 8080
 // #define SERVER_ADDRESS "172.30.1.98"
 // #define SERVER_ADDRESS "192.168.0.51"
 #define SERVER_ADDRESS "192.168.0.3"
